@@ -1,5 +1,15 @@
 const std = @import("std");
 
+pub fn rel(comptime path: []const u8) []const u8 {
+    return comptime std.fs.path.dirname(@src().file).? ++ std.fs.path.sep_str ++ path;
+}
+
+pub fn link(exe: *std.build.LibExeObjStep) void {
+    exe.linkLibC();
+    exe.linkSystemLibrary("mimalloc");
+    exe.addPackagePath("mimalloc", rel("src/mimalloc.zig"));
+}
+
 pub fn build(b: *std.build.Builder) void {
     // Standard target options allows the person running `zig build` to choose
     // what target to build for. Here we do not override the defaults, which
@@ -12,8 +22,7 @@ pub fn build(b: *std.build.Builder) void {
     const mode = b.standardReleaseOptions();
 
     const exe = b.addExecutable("zig", "src/main.zig");
-    exe.linkLibC();
-    exe.linkSystemLibrary("mimalloc");
+    link(exe);
     exe.setTarget(target);
     exe.setBuildMode(mode);
     exe.install();

@@ -3,7 +3,7 @@ const std = @import("std");
 pub fn main() !void {
     // var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     // const a = gpa.allocator();
-    const a = @import("mimalloc.zig").global_allocator;
+    const a = @import("mimalloc").global_allocator;
     
     var map = std.StringHashMap(i32).init(a);
     defer map.deinit();

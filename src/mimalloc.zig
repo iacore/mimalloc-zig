@@ -9,13 +9,11 @@ const mi = @cImport(@cInclude("mimalloc.h"));
 
 pub const global_allocator = Allocator{
     .ptr = undefined,
-    .vtable = &vtable,
-};
-
-const vtable = Allocator.VTable{
-    .alloc = alloc,
-    .resize = resize,
-    .free = free,
+    .vtable = &Allocator.VTable{
+        .alloc = alloc,
+        .resize = resize,
+        .free = free,
+    },
 };
 
 fn alloc(ctx: *anyopaque, len: usize, ptr_align: u8, ret_addr: usize) ?[*]u8 {
