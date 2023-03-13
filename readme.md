@@ -1,6 +1,6 @@
 # mimalloc for zig
 
-source code of mimalloc is bundled as git submodule
+Copy of source code of mimalloc is bundled.
 
 Usage:
 

@@ -28,22 +28,22 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     lib.linkLibC();
-    lib.addIncludePath("mimalloc/include");
+    lib.addIncludePath("mimalloc-archive/include");
     lib.addCSourceFiles(&.{
-        "mimalloc/src/stats.c",
-        "mimalloc/src/random.c",
-        "mimalloc/src/os.c",
-        "mimalloc/src/bitmap.c",
-        "mimalloc/src/arena.c",
-        "mimalloc/src/segment-cache.c",
-        "mimalloc/src/segment.c",
-        "mimalloc/src/page.c",
-        "mimalloc/src/alloc.c",
-        "mimalloc/src/alloc-aligned.c",
-        "mimalloc/src/alloc-posix.c",
-        "mimalloc/src/heap.c",
-        "mimalloc/src/options.c",
-        "mimalloc/src/init.c",
+        "mimalloc-archive/src/stats.c",
+        "mimalloc-archive/src/random.c",
+        "mimalloc-archive/src/os.c",
+        "mimalloc-archive/src/bitmap.c",
+        "mimalloc-archive/src/arena.c",
+        "mimalloc-archive/src/segment-cache.c",
+        "mimalloc-archive/src/segment.c",
+        "mimalloc-archive/src/page.c",
+        "mimalloc-archive/src/alloc.c",
+        "mimalloc-archive/src/alloc-aligned.c",
+        "mimalloc-archive/src/alloc-posix.c",
+        "mimalloc-archive/src/heap.c",
+        "mimalloc-archive/src/options.c",
+        "mimalloc-archive/src/init.c",
     }, &.{});
 
     // This declares intent for the library to be installed into the standard
