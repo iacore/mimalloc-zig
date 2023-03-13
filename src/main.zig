@@ -1,8 +1,6 @@
 const std = @import("std");
 
-pub fn main() !void {
-    // var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    // const a = gpa.allocator();
+test {
     const a = @import("mimalloc").global_allocator;
     
     var map = std.StringHashMap(i32).init(a);

@@ -1,6 +1,6 @@
 # mimalloc for zig
 
-Right now, you need to have `mimalloc` installed on your system to use this library.
+source code of mimalloc is bundled as git submodule
 
 Usage:
 
@@ -10,7 +10,7 @@ Usage:
 
 ## API
 
-- [ ] link static, without libc
+- [x] link static (use musl target)
 - [x] global (malloc/free)
 - [ ] heap
 - [ ] option

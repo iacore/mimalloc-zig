@@ -1,45 +1,68 @@
 const std = @import("std");
 
-pub fn rel(comptime path: []const u8) []const u8 {
-    return comptime std.fs.path.dirname(@src().file).? ++ std.fs.path.sep_str ++ path;
-}
-
-pub fn link(exe: *std.build.LibExeObjStep) void {
-    exe.linkLibC();
-    exe.linkSystemLibrary("mimalloc");
-    exe.addPackagePath("mimalloc", rel("src/mimalloc.zig"));
-}
-
-pub fn build(b: *std.build.Builder) void {
+// Although this function looks imperative, note that its job is to
+// declaratively construct a build graph that will be executed by an external
+// runner.
+pub fn build(b: *std.Build) void {
     // Standard target options allows the person running `zig build` to choose
     // what target to build for. Here we do not override the defaults, which
     // means any target is allowed, and the default is native. Other options
     // for restricting supported target set are available.
     const target = b.standardTargetOptions(.{});
 
-    // Standard release options allow the person running `zig build` to select
-    // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
-    const mode = b.standardReleaseOptions();
+    // Standard optimization options allow the person running `zig build` to select
+    // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall. Here we do not
+    // set a preferred release mode, allowing the user to decide how to optimize.
+    const optimize = b.standardOptimizeOption(.{});
 
-    const exe = b.addExecutable("zig", "src/main.zig");
-    link(exe);
-    exe.setTarget(target);
-    exe.setBuildMode(mode);
-    exe.install();
+    const mod = b.addModule("mimalloc", .{
+        .source_file = .{ .path = "src/mimalloc.zig" },
+    });
 
-    const run_cmd = exe.run();
-    run_cmd.step.dependOn(b.getInstallStep());
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
+    const lib = b.addStaticLibrary(.{
+        .name = "mimalloc",
+        // In this case the main source file is merely a path, however, in more
+        // complicated build scripts, this could be a generated file.
+        // .root_source_file = .{ .path = "src/main.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    lib.linkLibC();
+    lib.addIncludePath("mimalloc/include");
+    lib.addCSourceFiles(&.{
+        "mimalloc/src/stats.c",
+        "mimalloc/src/random.c",
+        "mimalloc/src/os.c",
+        "mimalloc/src/bitmap.c",
+        "mimalloc/src/arena.c",
+        "mimalloc/src/segment-cache.c",
+        "mimalloc/src/segment.c",
+        "mimalloc/src/page.c",
+        "mimalloc/src/alloc.c",
+        "mimalloc/src/alloc-aligned.c",
+        "mimalloc/src/alloc-posix.c",
+        "mimalloc/src/heap.c",
+        "mimalloc/src/options.c",
+        "mimalloc/src/init.c",
+    }, &.{});
 
-    const run_step = b.step("run", "Run the app");
-    run_step.dependOn(&run_cmd.step);
+    // This declares intent for the library to be installed into the standard
+    // location when the user invokes the "install" step (the default step when
+    // running `zig build`).
+    lib.install();
 
-    const exe_tests = b.addTest("src/main.zig");
-    exe_tests.setTarget(target);
-    exe_tests.setBuildMode(mode);
+    // Creates a step for unit testing.
+    const main_tests = b.addTest(.{
+        .root_source_file = .{ .path = "src/main.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    main_tests.addModule("mimalloc", mod);
+    main_tests.linkLibrary(lib);
 
-    const test_step = b.step("test", "Run unit tests");
-    test_step.dependOn(&exe_tests.step);
+    // This creates a build step. It will be visible in the `zig build --help` menu,
+    // and can be selected like this: `zig build test`
+    // This will evaluate the `test` step rather than the default, which is "install".
+    const test_step = b.step("test", "Run library tests");
+    test_step.dependOn(&main_tests.step);
 }
