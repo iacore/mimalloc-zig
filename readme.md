@@ -12,6 +12,11 @@ exe.addModule("mimalloc", mod_mi.module("mimalloc"));
 exe.linkLibrary(mod_mi.artifact("mimalloc"));
 ```
 
+> Warning:
+> Github archive download is not working with git submodules
+> The following method is not working as of now
+> Please clone this repo locally and use `exe.addDependency*`.
+
 `build.zig.zon`
 ```
 .{
