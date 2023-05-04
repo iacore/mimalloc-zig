@@ -32,7 +32,9 @@ exe.linkLibrary(mod_mi.artifact("mimalloc"));
 
 ## API
 
+The bound API is primitive. For more control over the mimalloc heaps, please contribute.
+
 - [x] link static (use musl target)
 - [x] global (malloc/free)
-- [ ] heap
+- [x] heap
 - [ ] option
